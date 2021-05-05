@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/widgets/paypal_payment.dart';
 
 import '../providers/cart.dart' show Cart;
 import '../providers/orders.dart';
@@ -87,12 +88,28 @@ class _OrderButtonState extends State<OrderButton> {
               setState(() {
                 _isLoading = true;
               });
-              await Provider.of<Orders>(context, listen: false).addOrder(
-                  widget.cart.items.values.toList(), widget.cart.totalAmount);
-              setState(() {
-                _isLoading = false;
-              });
-              widget.cart.clear();
+
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => PaypalPayment(
+                        cart: widget.cart,
+                        onFinish: (number) async {
+                          // payment done
+                          print('order id: ' + number);
+                          await Provider.of<Orders>(context, listen: false)
+                              .addOrder(widget.cart.items.values.toList(),
+                                  widget.cart.totalAmount);
+                        },
+                      ),
+                    ),
+                  )
+                  .then(
+                    (_) => setState(() {
+                      _isLoading = false;
+                      widget.cart.clear();
+                    }),
+                  );
             },
       child: _isLoading ? CircularProgressIndicator() : Text('ORDER NOW'),
       style: TextButton.styleFrom(

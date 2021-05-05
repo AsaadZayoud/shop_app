@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/providers/auth.dart';
+import 'package:shop/providers/camera.dart';
 import 'package:shop/providers/cart.dart';
 import 'package:shop/providers/orders.dart';
 import 'package:shop/providers/products.dart';
@@ -33,6 +34,10 @@ class MyApp extends StatelessWidget {
             update: (ctx, authValue, previousOrders) => previousOrders
               ..getData(authValue.token, authValue.userId,
                   previousOrders == null ? null : previousOrders.orders)),
+        ChangeNotifierProxyProvider<Auth, PickImage>(
+            create: (_) => PickImage(),
+            update: (ctx, authValue, previousCameras) =>
+                previousCameras..getData(authValue.token, authValue.userId)),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/providers/product.dart';
 import 'package:shop/providers/products.dart';
+import 'package:shop/providers/camera.dart';
 
 class EditProdutScreen extends StatefulWidget {
   static const routName = 'Edit';
@@ -90,10 +92,28 @@ class _EditProdutScreenState extends State<EditProdutScreen> {
       _isLoading = true;
     });
     if (_editedProduct.id != null) {
+      await Provider.of<PickImage>(context, listen: false)
+          .uplade(_editedProduct.imageUrl);
+      _editedProduct = Product(
+          id: _editedProduct.id,
+          description: _editedProduct.description,
+          imageUrl: Provider.of<PickImage>(context, listen: false).imageUrl,
+          price: _editedProduct.price,
+          isFavorite: _editedProduct.isFavorite,
+          title: _editedProduct.title);
       await Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct, _editedProduct.id);
     } else {
       try {
+        await Provider.of<PickImage>(context, listen: false).uplade(null);
+
+        _editedProduct = Product(
+            id: _editedProduct.id,
+            description: _editedProduct.description,
+            imageUrl: Provider.of<PickImage>(context, listen: false).imageUrl,
+            price: _editedProduct.price,
+            isFavorite: _editedProduct.isFavorite,
+            title: _editedProduct.title);
         await Provider.of<Products>(context, listen: false)
             .addProduct(_editedProduct);
       } catch (e) {
@@ -124,6 +144,7 @@ class _EditProdutScreenState extends State<EditProdutScreen> {
           title: Text("Edit Product"),
           actions: [
             IconButton(icon: Icon(Icons.save), onPressed: () => _saveForm())
+            // Provider.of<PickImage>(context, listen: false).init();
           ],
         ),
         body: _isLoading
@@ -219,7 +240,7 @@ class _EditProdutScreenState extends State<EditProdutScreen> {
                           },
                         ),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
                               width: 100,
@@ -231,45 +252,21 @@ class _EditProdutScreenState extends State<EditProdutScreen> {
                               decoration: BoxDecoration(
                                   border:
                                       Border.all(width: 1, color: Colors.grey)),
-                              child: _imageUrlController.text.isEmpty
-                                  ? Text('Enter a URL')
-                                  : FittedBox(
-                                      child: Image.network(
-                                        _imageUrlController.text,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                              child: FittedBox(
+                                child: Provider.of<PickImage>(context,
+                                        listen: true)
+                                    .show(_editedProduct.id,
+                                        _editedProduct.imageUrl),
+                              ),
                             ),
                             Expanded(
-                              child: TextFormField(
-                                controller: _imageUrlController,
-                                decoration:
-                                    InputDecoration(labelText: 'Image URL'),
-                                focusNode: _imageUrlFocusNode,
-                                keyboardType: TextInputType.url,
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Please enter a image URL.';
-                                  }
-                                  if (!value.startsWith('http') &&
-                                      !value.startsWith('https')) {
-                                    return 'Please enter a valid URL.';
-                                  }
-                                  if (!value.endsWith('png') &&
-                                      !value.endsWith('jpg') &&
-                                      !value.endsWith('jpeg')) {
-                                    return 'Please enter a valid URL.';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _editedProduct = Product(
-                                      id: _editedProduct.id,
-                                      description: _editedProduct.description,
-                                      imageUrl: value,
-                                      price: _editedProduct.price,
-                                      isFavorite: _editedProduct.isFavorite,
-                                      title: _editedProduct.title);
+                              child: ElevatedButton(
+                                child: Text("Select Image From Gallery"),
+                                onPressed: () {
+                                  print('the title ${_editedProduct.title}');
+                                  Provider.of<PickImage>(context, listen: false)
+                                      .pickImageFromGallery(
+                                          ImageSource.gallery);
                                 },
                               ),
                             ),

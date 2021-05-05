@@ -66,8 +66,8 @@ class Products with ChangeNotifier {
     final filteredString =
         filterByUser ? 'orderBy="createrId"&equalTo="$userId"' : '';
     print('auth token $authtoken');
-    var url =
-        'https://chat-app-f7779-default-rtdb.firebaseio.com/products.json?auth=$authtoken&$filteredString';
+    var url = Uri.parse(
+        'https://chat-app-f7779-default-rtdb.firebaseio.com/products.json?auth=$authtoken&$filteredString');
 
     try {
       final res = await http.get(url);
@@ -75,8 +75,8 @@ class Products with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
-      var urldata =
-          'https://chat-app-f7779-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authtoken';
+      var urldata = Uri.parse(
+          'https://chat-app-f7779-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authtoken');
 
       final favRes = await http.get(urldata);
       final favData = json.decode(favRes.body);
@@ -95,13 +95,14 @@ class Products with ChangeNotifier {
       _items = loadProduts;
       notifyListeners();
     } catch (e) {
-      throw e;
+      print('$e');
+      // throw e;
     }
   }
 
   Future<void> addProduct(Product product) async {
-    final url =
-        'https://chat-app-f7779-default-rtdb.firebaseio.com/products.json?auth=$authtoken';
+    final url = Uri.parse(
+        'https://chat-app-f7779-default-rtdb.firebaseio.com/products.json?auth=$authtoken');
     try {
       final res = await http.post(url,
           body: json.encode({
@@ -128,8 +129,8 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(Product newProduct, String id) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
-      final url =
-          'https://chat-app-f7779-default-rtdb.firebaseio.com/products/$id.json?auth=$authtoken';
+      final url = Uri.parse(
+          'https://chat-app-f7779-default-rtdb.firebaseio.com/products/$id.json?auth=$authtoken');
       await http.patch(url,
           body: json.encode({
             'title': newProduct.title,
@@ -143,8 +144,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url =
-        'https://chat-app-f7779-default-rtdb.firebaseio.com/products/$id.json?auth=$authtoken';
+    final url = Uri.parse(
+        'https://chat-app-f7779-default-rtdb.firebaseio.com/products/$id.json?auth=$authtoken');
 
     final existingproductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingproduct = _items[existingproductIndex];

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/providers/camera.dart';
 import 'package:shop/providers/product.dart';
 import 'package:shop/providers/products.dart';
 import 'package:shop/screens/edit_product_screen.dart';
@@ -27,6 +28,7 @@ class UserProductItem extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context)
                       .pushNamed(EditProdutScreen.routName, arguments: id);
+                  Provider.of<PickImage>(context, listen: false).init();
                 }),
             IconButton(
               icon: Icon(Icons.delete),

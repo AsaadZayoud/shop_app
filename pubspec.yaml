@@ -26,7 +26,12 @@ dependencies:
   provider:
   intl:
   http:
+  googleapis_auth:
   shared_preferences:
+  http_auth: ^1.0.0
+  webview_flutter: ^2.0.4
+  image_picker:
+  imgur: ^1.1.1
 
   cupertino_icons: ^1.0.0
 
